@@ -14,13 +14,36 @@ app.get("/messages", async (req, res) => {
 
 app.post("/messages", async (req, res) => {
   const { text, parentId } = req.body;
-  const newMessage = await prisma.message.create({
+  const message = await prisma.message.create({
     data: {
       text,
       parentId,
     },
   });
-  res.send(newMessage);
+  res.send({ success: true, message });
+});
+
+app.put("/messages/:messageId", async (req, res) => {
+  const { messageId } = req.params;
+  const { text, likes } = req.body;
+
+  if (!text && likes === undefined) {
+    return res.send({
+      success: false,
+      error: "please include either likes or text",
+    });
+  }
+
+  const message = await prisma.message.update({
+    where: {
+      id: messageId,
+    },
+    data: {
+      likes,
+      text,
+    },
+  });
+  res.send({ success: true, message });
 });
 
 app.use((req, res) => {
