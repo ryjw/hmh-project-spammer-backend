@@ -27,6 +27,16 @@ app.put("/messages/:messageId", async (req, res) => {
   const { messageId } = req.params;
   const { text, likes } = req.body;
 
+  const isPresent = await prisma.message.findUnique({
+    where: {
+      id: messageId,
+    },
+  });
+
+  if (!isPresent) {
+    return res.send({ success: false, error: "no such ID found" });
+  }
+
   if (!text && likes === undefined) {
     return res.send({
       success: false,
@@ -41,6 +51,27 @@ app.put("/messages/:messageId", async (req, res) => {
     data: {
       likes,
       text,
+    },
+  });
+  res.send({ success: true, message });
+});
+
+app.delete("/messages/:messageId", async (req, res) => {
+  const { messageId } = req.params;
+
+  const message = await prisma.message.findUnique({
+    where: {
+      id: messageId,
+    },
+  });
+
+  if (!message) {
+    return res.send({ success: false, error: "no such ID found" });
+  }
+
+  await prisma.message.delete({
+    where: {
+      id: messageId,
     },
   });
   res.send({ success: true, message });
