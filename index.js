@@ -8,7 +8,15 @@ const app = express();
 app.use(express.json());
 
 app.get("/messages", async (req, res) => {
-  const messages = await prisma.message.findMany();
+  const messages = await prisma.message.findMany({
+    include: {
+      children: {
+        include: {
+          children: { include: { children: { include: { children: true } } } },
+        },
+      },
+    },
+  });
   res.send({ success: true, messages });
 });
 

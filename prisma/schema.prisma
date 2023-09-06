@@ -16,4 +16,6 @@ model Message {
   text String
   parentId String?
   likes Int @default(0)
+  children Message[] @relation("parentchild") 
+  parent Message? @relation("parentchild", fields: [parentId], references: [id])
 }
