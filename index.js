@@ -22,6 +22,9 @@ app.get("/messages", async (req, res) => {
 
 app.post("/messages", async (req, res) => {
   const { text, parentId } = req.body;
+  if (!text) {
+    return res.send({ success: false, error: "Please include some text" });
+  }
   const message = await prisma.message.create({
     data: {
       text,
@@ -93,7 +96,7 @@ app.use((error, req, res, next) => {
   res.send({ success: false, error: error.message });
 });
 
-const port = 3000;
+const port = 10000;
 
 app.listen(port, () => {
   console.log(`app listening on port ${port}`);
