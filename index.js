@@ -10,84 +10,101 @@ app.use(express.json());
 app.use(cors());
 
 app.get("/messages", async (req, res) => {
-  const messages = await prisma.message.findMany({
-    include: {
-      children: {
-        include: {
-          children: { include: { children: { include: { children: true } } } },
+  try {
+    const messages = await prisma.message.findMany({
+      include: {
+        children: {
+          include: {
+            children: {
+              include: { children: { include: { children: true } } },
+            },
+          },
         },
       },
-    },
-  });
-  res.send({ success: true, messages });
+    });
+    res.send({ success: true, messages });
+  } catch (error) {
+    res.send({ success: false, error });
+  }
 });
 
 app.post("/messages", async (req, res) => {
-  const { text, parentId } = req.body;
-  if (!text) {
-    return res.send({ success: false, error: "Please include some text" });
+  try {
+    const { text, parentId } = req.body;
+    if (!text) {
+      return res.send({ success: false, error: "Please include some text" });
+    }
+    const message = await prisma.message.create({
+      data: {
+        text,
+        parentId,
+      },
+    });
+    res.send({ success: true, message });
+  } catch (error) {
+    res.send({ success: true, error });
   }
-  const message = await prisma.message.create({
-    data: {
-      text,
-      parentId,
-    },
-  });
-  res.send({ success: true, message });
 });
 
 app.put("/messages/:messageId", async (req, res) => {
-  const { messageId } = req.params;
-  const { text, likes } = req.body;
-
-  const isPresent = await prisma.message.findUnique({
-    where: {
-      id: messageId,
-    },
-  });
-
-  if (!isPresent) {
-    return res.send({ success: false, error: "no such ID found" });
-  }
-
-  if (!text && likes === undefined) {
-    return res.send({
-      success: false,
-      error: "please include either likes or text",
+  try {
+    const { messageId } = req.params;
+    const { text, likes } = req.body;
+    const isPresent = await prisma.message.findUnique({
+      where: {
+        id: messageId,
+      },
     });
-  }
 
-  const message = await prisma.message.update({
-    where: {
-      id: messageId,
-    },
-    data: {
-      likes,
-      text,
-    },
-  });
-  res.send({ success: true, message });
+    if (!isPresent) {
+      return res.send({ success: false, error: "no such ID found" });
+    }
+
+    if (!text && likes === undefined) {
+      return res.send({
+        success: false,
+        error: "please include either likes or text",
+      });
+    }
+
+    const message = await prisma.message.update({
+      where: {
+        id: messageId,
+      },
+      data: {
+        likes,
+        text,
+      },
+    });
+    res.send({ success: true, message });
+  } catch (error) {
+    res.send({ success: false, error });
+  }
 });
 
 app.delete("/messages/:messageId", async (req, res) => {
-  const { messageId } = req.params;
+  try {
+    const { messageId } = req.params;
 
-  const message = await prisma.message.findUnique({
-    where: {
-      id: messageId,
-    },
-  });
+    const message = await prisma.message.findUnique({
+      where: {
+        id: messageId,
+      },
+    });
 
-  if (!message) {
-    return res.send({ success: false, error: "no such ID found" });
+    if (!message) {
+      return res.send({ success: false, error: "no such ID found" });
+    }
+
+    await prisma.message.delete({
+      where: {
+        id: messageId,
+      },
+    });
+    res.send({ success: true, message });
+  } catch (error) {
+    res.send({ success: false, error });
   }
-
-  await prisma.message.delete({
-    where: {
-      id: messageId,
-    },
-  });
-  res.send({ success: true, message });
 });
 
 app.use((req, res) => {
