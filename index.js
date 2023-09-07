@@ -7,6 +7,12 @@ const app = express();
 
 app.use(express.json());
 
+app.all("/", function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  next();
+});
+
 app.get("/messages", async (req, res) => {
   const messages = await prisma.message.findMany({
     include: {
@@ -94,12 +100,6 @@ app.use((req, res) => {
 
 app.use((error, req, res, next) => {
   res.send({ success: false, error: error.message });
-});
-
-app.all("/", function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  next();
 });
 
 const port = 10000;
