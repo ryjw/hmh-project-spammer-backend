@@ -24,7 +24,7 @@ app.get("/messages", async (req, res) => {
     });
     res.send({ success: true, messages });
   } catch (error) {
-    res.send({ success: false, error });
+    res.send({ success: false, error: error.message });
   }
 });
 
@@ -42,7 +42,7 @@ app.post("/messages", async (req, res) => {
     });
     res.send({ success: true, message });
   } catch (error) {
-    res.send({ success: true, error });
+    res.send({ success: true, error: error.message });
   }
 });
 
@@ -78,7 +78,7 @@ app.put("/messages/:messageId", async (req, res) => {
     });
     res.send({ success: true, message });
   } catch (error) {
-    res.send({ success: false, error });
+    res.send({ success: false, error: error.message });
   }
 });
 
@@ -102,7 +102,7 @@ app.delete("/messages/:messageId", async (req, res) => {
     });
     res.send({ success: true, message });
   } catch (error) {
-    res.send({ success: false, error });
+    res.send({ success: false, error: error.message });
   }
 });
 
