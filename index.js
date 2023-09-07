@@ -1,17 +1,13 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import cors from "cors";
 
 const prisma = new PrismaClient();
 
 const app = express();
 
 app.use(express.json());
-
-app.all("/", function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  next();
-});
+app.use(cors());
 
 app.get("/messages", async (req, res) => {
   const messages = await prisma.message.findMany({
