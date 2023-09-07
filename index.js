@@ -83,9 +83,8 @@ app.put("/messages/:messageId", async (req, res) => {
 });
 
 app.delete("/messages/:messageId", async (req, res) => {
+  const { messageId } = req.params;
   try {
-    const { messageId } = req.params;
-
     const message = await prisma.message.findUnique({
       where: {
         id: messageId,
