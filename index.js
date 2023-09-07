@@ -96,6 +96,10 @@ app.use((error, req, res, next) => {
   res.send({ success: false, error: error.message });
 });
 
+app.get("/cors", (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+});
+
 const port = 10000;
 
 app.listen(port, () => {
